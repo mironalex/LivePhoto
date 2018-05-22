@@ -9,8 +9,16 @@
     tools:context="com.thedesert.fox.livephoto.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TableLayout
+    <GridView
+        android:id="@+id/gridview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </TableLayout>
+        android:layout_height="match_parent"
+        android:numColumns="auto_fit"
+        android:columnWidth="75dp"
+        android:stretchMode="columnWidth"
+        android:padding="5dp"
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
+        android:gravity="center">
+    </GridView>
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,8 @@
 package com.thedesert.fox.livephoto
 
 import android.Manifest
+import android.app.PendingIntent.getActivity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -13,6 +15,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.Window
 import android.view.WindowManager
+import android.widget.GridView
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler
 import com.thedesert.fox.livephoto.R.id.fab
 import com.thedesert.fox.livephoto.R.id.toolbar
 
@@ -30,21 +35,26 @@ class MainActivity : AppCompatActivity() {
                         != PackageManager.PERMISSION_GRANTED) or
                 (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) or
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.RECORD_AUDIO)
                         != PackageManager.PERMISSION_GRANTED)) {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.CAMERA), 1)
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.RECORD_AUDIO), 1)
         }
     }
 
     private fun createFolder(){
-        val folderName = "LivePhoto"
+        val folderName = "LivePhoto/.thumbnails"
         val file = File(Environment.getExternalStorageDirectory(), folderName)
         if(!file.exists()){
             file.mkdirs()
         }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +68,13 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
+
+        val gridView = findViewById<GridView>(R.id.gridview)
+        val imageAdapter = ImageAdapter(this)
+        gridView.adapter = imageAdapter
+        val asyncTaskLoadFiles =  AsyncTaskLoadFiles(imageAdapter)
+        asyncTaskLoadFiles.execute()
+
 
     }
 
