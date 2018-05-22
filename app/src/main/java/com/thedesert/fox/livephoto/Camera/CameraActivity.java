@@ -1,4 +1,4 @@
-package com.thedesert.fox.livephoto;
+package com.thedesert.fox.livephoto.Camera;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +7,7 @@ import android.util.Log;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.thedesert.fox.livephoto.R;
 
 
 public class CameraActivity  extends AppCompatActivity{

@@ -1,4 +1,4 @@
-package com.thedesert.fox.livephoto;
+package com.thedesert.fox.livephoto.Gallery;
 
 import android.os.AsyncTask;
 import android.os.Environment;

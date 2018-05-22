@@ -1,4 +1,4 @@
-package com.thedesert.fox.livephoto;
+package com.thedesert.fox.livephoto.Camera;
 
 import android.content.Context;
 import android.util.AttributeSet;

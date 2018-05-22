@@ -1,13 +1,10 @@
-package com.thedesert.fox.livephoto
+package com.thedesert.fox.livephoto.Gallery
 
 import android.Manifest
-import android.app.PendingIntent.getActivity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
-import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -15,15 +12,15 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.Toast
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg
-import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler
-import com.thedesert.fox.livephoto.R.id.fab
-import com.thedesert.fox.livephoto.R.id.toolbar
+import com.thedesert.fox.livephoto.Camera.CameraActivity
+import com.thedesert.fox.livephoto.R
 
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
+
+    private final val REQUEST_CODE = 1
 
     private fun requestPermissions(){
         if((ContextCompat.checkSelfPermission(this,
@@ -42,8 +39,9 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.CAMERA,
-                            Manifest.permission.RECORD_AUDIO), 1)
+                            Manifest.permission.RECORD_AUDIO), REQUEST_CODE)
         }
+        initGridview()
     }
 
     private fun createFolder(){
@@ -54,6 +52,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun initGridview(){
+        val gridView = findViewById<GridView>(R.id.gridview)
+        val imageAdapter = ImageAdapter(this)
+        gridView.adapter = imageAdapter
+        val asyncTaskLoadFiles = AsyncTaskLoadFiles(imageAdapter)
+        asyncTaskLoadFiles.execute()
+
+        gridView.onItemClickListener = object : AdapterView.OnItemClickListener {
+            override fun onItemClick(parrent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Toast.makeText(applicationContext, "item $position clicked", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,17 +78,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
+    }
 
-        val gridView = findViewById<GridView>(R.id.gridview)
-        val imageAdapter = ImageAdapter(this)
-        gridView.adapter = imageAdapter
-        val asyncTaskLoadFiles =  AsyncTaskLoadFiles(imageAdapter)
-        asyncTaskLoadFiles.execute()
-
-        gridView.onItemClickListener = object : AdapterView.OnItemClickListener {
-            override fun onItemClick(parrent: AdapterView<*>?, view: View?, poisiton: Int, id: Long) {
-                Toast.makeText(applicationContext, "item clicked", Toast.LENGTH_SHORT).show()
-            }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE){
+            initGridview()
         }
     }
 
@@ -95,5 +101,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initGridview()
     }
 }

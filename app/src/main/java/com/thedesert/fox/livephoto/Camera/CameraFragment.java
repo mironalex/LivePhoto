@@ -1,4 +1,4 @@
-package com.thedesert.fox.livephoto;
+package com.thedesert.fox.livephoto.Camera;
 
 import android.Manifest;
 import android.app.Activity;
@@ -41,6 +41,7 @@ import android.widget.Toast;
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import com.thedesert.fox.livephoto.R;
 
 
 import java.io.File;
@@ -681,7 +682,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
                 "-vframes",
                 "1",
                 "-q:v",
-                "5",
+                "15",
                 dir + "/.thumbnails/" + removeExtension(filename) + ".jpg"
         };
         try{

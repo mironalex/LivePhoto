@@ -1,4 +1,4 @@
-package com.thedesert.fox.livephoto;
+package com.thedesert.fox.livephoto.Gallery;
 
 import android.content.Context;
 import android.graphics.Bitmap;
