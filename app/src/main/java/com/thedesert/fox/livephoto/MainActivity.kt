@@ -11,11 +11,10 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.Window
-import android.view.WindowManager
+import android.view.*
+import android.widget.AdapterView
 import android.widget.GridView
+import android.widget.Toast
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler
 import com.thedesert.fox.livephoto.R.id.fab
@@ -75,7 +74,11 @@ class MainActivity : AppCompatActivity() {
         val asyncTaskLoadFiles =  AsyncTaskLoadFiles(imageAdapter)
         asyncTaskLoadFiles.execute()
 
-
+        gridView.onItemClickListener = object : AdapterView.OnItemClickListener {
+            override fun onItemClick(parrent: AdapterView<*>?, view: View?, poisiton: Int, id: Long) {
+                Toast.makeText(applicationContext, "item clicked", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
