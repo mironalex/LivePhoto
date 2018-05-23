@@ -1,6 +1,7 @@
 package com.thedesert.fox.livephoto.Gallery
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -61,7 +62,15 @@ class MainActivity : AppCompatActivity() {
 
         gridView.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(parrent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Toast.makeText(applicationContext, "item $position clicked", Toast.LENGTH_SHORT).show()
+                val thumb = File(parrent!!.getItemAtPosition(position).toString())
+                val dir = thumb.parentFile.parentFile.absolutePath
+                val gif = dir + '/' +
+                        thumb.name.substring(0, thumb.name.lastIndexOf(".")) +
+                        ".gif"
+
+                val intent = Intent(this@MainActivity, GifActivity::class.java)
+                intent.putExtra("gif", gif)
+                startActivity(intent)
             }
         }
     }
