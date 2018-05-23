@@ -29,6 +29,7 @@
         <activity
             android:name=".Camera.CameraActivity"
             android:theme="@style/Theme.Design.NoActionBar" />
+        <activity android:name=".Gallery.GifActivity"></activity>
     </application>
 
 </manifest>
