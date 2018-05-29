@@ -8,3 +8,4 @@
         android:title="@string/create_livephoto"
         app:showAsAction="never" />
 </menu>
+

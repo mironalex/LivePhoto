@@ -8,4 +8,6 @@
     <string name="record">record</string>
     <string name="takes_picture">Takes the picture</string>
     <string name="create_livephoto">Create LivePhoto</string>
+    <string name="share">Share</string>
+    <string name="delete">Delete</string>
 </resources>

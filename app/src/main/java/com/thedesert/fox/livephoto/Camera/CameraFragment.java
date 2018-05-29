@@ -1,6 +1,5 @@
 package com.thedesert.fox.livephoto.Camera;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,7 +7,6 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -27,7 +25,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -38,11 +36,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
 import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import com.thedesert.fox.livephoto.R;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -63,11 +61,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
     private static final String FRAGMENT_DIALOG = "dialog";
     private static final int REAR_CAMERA = 0;
     private static final int FRONT_CAMERA = 1;
-
-    private static final String[] VIDEO_PERMISSIONS = {
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
-    };
+    private int CURRENT_CAMERA = REAR_CAMERA;
 
     static {
         DEFAULT_ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -145,7 +139,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
     private Size mVideoSize;
 
     /**
-     * MediaRecorder
+     * The {@link android.media.MediaRecorder}
      */
     private MediaRecorder mMediaRecorder;
 
@@ -268,9 +262,14 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
-        mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        mButtonVideo = (ImageButton) view.findViewById(R.id.picture);
+        mTextureView = view.findViewById(R.id.texture);
+        mButtonVideo = view.findViewById(R.id.picture);
+        /*
+       A reference to the switch camera button
+     */
+        FloatingActionButton mSwitchCamera = view.findViewById(R.id.switch_camera);
         mButtonVideo.setOnClickListener(this);
+        mSwitchCamera.setOnClickListener(this);
     }
 
     @Override
@@ -302,15 +301,20 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
                 }
                 break;
             }
-            case R.id.info: {
-                Activity activity = getActivity();
-                if (null != activity) {
-                    new AlertDialog.Builder(activity)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
-                }
-                break;
+            case R.id.switch_camera: {
+                switchCamera();
             }
+        }
+    }
+
+
+    private void switchCamera(){
+        closeCamera();
+        if (CURRENT_CAMERA == REAR_CAMERA){
+            openCamera(mTextureView.getWidth(), mTextureView.getHeight(), FRONT_CAMERA);
+        }
+        else{
+            openCamera(mTextureView.getWidth(), mTextureView.getHeight(), REAR_CAMERA);
         }
     }
 
@@ -337,16 +341,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    private boolean hasPermissionsGranted(String[] permissions) {
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Tries to open a {@link CameraDevice}. The result is listened by `mStateCallback`.
      */
@@ -362,7 +356,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
+            assert manager != null;
             String cameraId = manager.getCameraIdList()[camera];
+            CURRENT_CAMERA = camera;
 
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
@@ -517,7 +513,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
-            mNextVideoAbsolutePath = getVideoFilePath(getActivity());
+            mNextVideoAbsolutePath = getVideoFilePath();
         }
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
@@ -537,7 +533,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
         mMediaRecorder.prepare();
     }
 
-    private String getVideoFilePath(Context context) {
+    private String getVideoFilePath() {
         final File dir = Environment.getExternalStorageDirectory();
         return (dir == null ? "" : (dir.getAbsolutePath() + "/LivePhoto/"))
                 + System.currentTimeMillis() + ".mp4";

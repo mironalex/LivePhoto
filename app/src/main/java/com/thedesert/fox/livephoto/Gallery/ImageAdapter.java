@@ -1,8 +1,6 @@
 package com.thedesert.fox.livephoto.Gallery;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,7 +15,7 @@ import java.util.ArrayList;
 public class ImageAdapter extends BaseAdapter {
 
     private Context mContext;
-    private ArrayList<String> imageList = new ArrayList<String>();
+    private ArrayList<String> imageList = new ArrayList<>();
 
     public ImageAdapter(Context context) {
         mContext = context;
@@ -52,7 +50,7 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (view == null) {
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(220, 220));
+            imageView.setLayoutParams(new GridView.LayoutParams(250, 250));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
         } else {
@@ -63,7 +61,7 @@ public class ImageAdapter extends BaseAdapter {
 
         ImageLoader.with(mContext)
                 .from(image)
-                .size(200, 200)
+                .size(250, 250)
                 .load(imageView);
 
         //Bitmap bitmap = decodeBitmapFromUri(imageList.get(i), 220, 220);

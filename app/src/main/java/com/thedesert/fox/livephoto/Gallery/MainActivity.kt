@@ -1,9 +1,10 @@
 package com.thedesert.fox.livephoto.Gallery
 
 import android.Manifest
-import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.support.v4.app.ActivityCompat
@@ -53,6 +54,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openLivePhoto(photo:String){
+        val thumb = File(photo)
+        val dir = thumb.parentFile.parentFile.absolutePath
+        val gif = dir + '/' +
+                thumb.name.substring(0, thumb.name.lastIndexOf(".")) +
+                ".gif"
+
+        val intent = Intent(this@MainActivity, GifActivity::class.java)
+        intent.putExtra("gif", gif)
+        startActivity(intent)
+    }
+
+    private fun deleteLivePhoto(photo:String){
+        val thumb_file = File(photo)
+        val dir = thumb_file.parentFile.parentFile.absolutePath
+        val gif = File(dir + '/' +
+                thumb_file.name.substring(0, thumb_file.name.lastIndexOf(".")) +
+                ".gif")
+        var deleted = thumb_file.delete()
+        deleted = gif.delete()
+        Toast.makeText(this, "Livephoto deleted.", Toast.LENGTH_SHORT).show()
+        initGridview()
+    }
+
+    private fun shareLivePhoto(photo:String){
+        val shareIntent = Intent()
+        shareIntent.action = Intent.ACTION_SEND
+
+        val thumb_file = File(photo)
+        val dir = thumb_file.parentFile.parentFile.absolutePath
+        val gif = File(dir + '/' +
+                thumb_file.name.substring(0, thumb_file.name.lastIndexOf(".")) +
+                ".gif")
+        val photoUri = Uri.fromFile(gif)
+
+        shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
+        shareIntent.type = "image/*"
+        startActivity(Intent.createChooser(shareIntent, "Send to"))
+    }
+
     private fun initGridview(){
         val gridView = findViewById<GridView>(R.id.gridview)
         val imageAdapter = ImageAdapter(this)
@@ -61,16 +102,40 @@ class MainActivity : AppCompatActivity() {
         asyncTaskLoadFiles.execute()
 
         gridView.onItemClickListener = object : AdapterView.OnItemClickListener {
-            override fun onItemClick(parrent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val thumb = File(parrent!!.getItemAtPosition(position).toString())
-                val dir = thumb.parentFile.parentFile.absolutePath
-                val gif = dir + '/' +
-                        thumb.name.substring(0, thumb.name.lastIndexOf(".")) +
-                        ".gif"
+            override fun onItemClick(parrent: AdapterView<*>?,
+                                     view: View?,
+                                     position: Int,
+                                     id: Long) {
+                val photo = parrent!!.getItemAtPosition(position).toString()
+                openLivePhoto(photo)
+            }
+        }
 
-                val intent = Intent(this@MainActivity, GifActivity::class.java)
-                intent.putExtra("gif", gif)
-                startActivity(intent)
+        gridView.onItemLongClickListener = object : AdapterView.OnItemLongClickListener {
+            override fun onItemLongClick(parrent: AdapterView<*>?,
+                                         view: View?,
+                                         position: Int,
+                                         id: Long): Boolean {
+                val options = resources.getStringArray(R.array.image_options)
+                val builder = AlertDialog.Builder(this@MainActivity)
+
+                builder
+                        .setTitle("Image options")
+                        .setItems(options,
+                                {
+                                    dialog, which ->
+                                    val selectedPhoto = parrent!!
+                                            .getItemAtPosition(position)
+                                            .toString()
+                                    when (options[which]){
+                                        "View" -> openLivePhoto(selectedPhoto)
+                                        "Share" -> shareLivePhoto(selectedPhoto)
+                                        "Delete" -> deleteLivePhoto(selectedPhoto)
+
+                                    }
+                                })
+                builder.show()
+                return true
             }
         }
     }

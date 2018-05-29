@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="image_options">
+        <item>View</item>
+        <item>Share</item>
+        <item>Delete</item>
+    </array>
+</resources>
