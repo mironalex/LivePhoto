@@ -7,4 +7,5 @@
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
     <string name="record">record</string>
     <string name="takes_picture">Takes the picture</string>
+    <string name="create_livephoto">Create LivePhoto</string>
 </resources>

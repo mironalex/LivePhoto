@@ -9,6 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.budiyev.android.imageloader.ImageLoader;
+
+import java.io.File;
 import java.util.ArrayList;
 
 public class ImageAdapter extends BaseAdapter {
@@ -16,15 +19,15 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<String> imageList = new ArrayList<String>();
 
-    public ImageAdapter(Context context){
+    public ImageAdapter(Context context) {
         mContext = context;
     }
 
-    public void clear(){
+    public void clear() {
         imageList.clear();
     }
 
-    public void add(String path){
+    public void add(String path) {
         imageList.add(path);
     }
 
@@ -47,20 +50,32 @@ public class ImageAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ImageView imageView;
-        if (view == null){
+        if (view == null) {
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(220,220));
+            imageView.setLayoutParams(new GridView.LayoutParams(220, 220));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8,8,8,8);
-        } else{
+            imageView.setPadding(8, 8, 8, 8);
+        } else {
             imageView = (ImageView) view;
         }
 
-        Bitmap bitmap = decodeBitmapFromUri(imageList.get(i), 220, 220);
+        File image = new File(imageList.get(i));
 
-        imageView.setImageBitmap(bitmap);
+        ImageLoader.with(mContext)
+                .from(image)
+                .size(200, 200)
+                .load(imageView);
+
+        //Bitmap bitmap = decodeBitmapFromUri(imageList.get(i), 220, 220);
+        //imageView.setImageBitmap(bitmap);
+
         return imageView;
     }
+}
+
+/*
+    This decodes the image in the main thread of the app resulting in a janky gallery
+    Replaced with a ImageLoader library...
 
     private Bitmap decodeBitmapFromUri(String path, int requestedWidth, int requestedHeight){
         Bitmap bitmap = null;
@@ -94,4 +109,5 @@ public class ImageAdapter extends BaseAdapter {
         }
         return inSampleSize;
     }
-}
+*/
+
