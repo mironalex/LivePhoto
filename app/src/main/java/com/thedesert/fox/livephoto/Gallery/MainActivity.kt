@@ -19,6 +19,7 @@ import com.thedesert.fox.livephoto.R
 
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
+import java.io.FileFilter
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,6 +65,18 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this@MainActivity, GifActivity::class.java)
         intent.putExtra("gif", gif)
         startActivity(intent)
+    }
+
+    private fun cleanFolder(){
+        val folderName = "Livephoto"
+        val folder = File(Environment.getExternalStorageDirectory(), folderName)
+        val files = folder.listFiles()
+        var mp4_files = files.filter {
+            f-> f.name.endsWith(".mp4")
+        }
+        for (f in mp4_files){
+            f.delete()
+        }
     }
 
     private fun deleteLivePhoto(photo:String){
@@ -170,6 +183,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        cleanFolder()
         initGridview()
     }
 }

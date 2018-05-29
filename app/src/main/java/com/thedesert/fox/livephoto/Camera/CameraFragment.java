@@ -128,6 +128,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
 
     };
 
+    private FloatingActionButton mSwitchCamera;
+
     /**
      * The {@link android.util.Size} of camera preview.
      */
@@ -267,7 +269,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
         /*
        A reference to the switch camera button
      */
-        FloatingActionButton mSwitchCamera = view.findViewById(R.id.switch_camera);
+        mSwitchCamera = view.findViewById(R.id.switch_camera);
         mButtonVideo.setOnClickListener(this);
         mSwitchCamera.setOnClickListener(this);
     }
@@ -540,6 +542,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
     }
 
     private void startRecordingVideo() {
+
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
         }
@@ -574,6 +577,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
                         @Override
                         public void run() {
                             // UI
+                            mSwitchCamera.hide();
                             mButtonVideo.setBackgroundResource(R.drawable.stop_record);
                             mIsRecordingVideo = true;
 
@@ -607,6 +611,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
     private void stopRecordingVideo() {
         // UI
         mIsRecordingVideo = false;
+        mSwitchCamera.show();
         mButtonVideo.setBackgroundResource(R.drawable.record);
         // Stop recording
         mMediaRecorder.stop();
@@ -614,7 +619,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener{
 
         Activity activity = getActivity();
         if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + mNextVideoAbsolutePath,
+            Toast.makeText(activity, "Gif saved.",
                     Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Video saved: " + mNextVideoAbsolutePath);
             convertVideoToGif(mNextVideoAbsolutePath);
